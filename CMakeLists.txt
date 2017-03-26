@@ -51,11 +51,12 @@ set_target_properties(contact-resource PROPERTIES COMPILE_FLAGS "-Wno-reserved-i
 
 # Build shared libraries.
 add_library(contact SHARED src/main.c src/contactapp.c src/contactappwin.c)
-target_link_libraries(contact ${GTK3_LIBRARIES} contact-resource)
+target_link_libraries(contact ${GTK3_LIBRARIES} )
 
 # Build
-add_executable(contact-bin src/main.c)
-target_link_libraries(contact-bin contact)
+add_executable(contact-bin src/main.c ${generated_resources})
+set_target_properties(contact-bin PROPERTIES COMPILE_FLAGS "-Wno-reserved-id-macro -Wno-documentation-unknown-command -Wno-documentation -Wno-padded" )
+target_link_libraries(contact-bin contact contact-resource)
 
 ###
 # TEST
@@ -87,3 +88,6 @@ if(BUILD_DOCUMENTATION)
 
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION share/doc)
 endif()
+
+# Blacklist sanitizer
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/blacklist.txt ${CMAKE_CURRENT_BINARY_DIR}/blacklist.txt @ONLY)

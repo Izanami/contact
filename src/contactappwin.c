@@ -12,10 +12,13 @@ struct _ContactAppWindow {
 
 G_DEFINE_TYPE(ContactAppWindow, contact_app_window, GTK_TYPE_APPLICATION_WINDOW)
 
-static void contact_app_window_init(ContactAppWindow *app) { (void)app; }
+static void contact_app_window_init(ContactAppWindow *win) {
+    gtk_widget_init_template(GTK_WIDGET(win));
+}
 
 static void contact_app_window_class_init(ContactAppWindowClass *class) {
-    (void)class;
+    gtk_widget_class_set_template_from_resource(
+        GTK_WIDGET_CLASS(class), "/org/gtk/contactapp/window.ui");
 }
 
 ContactAppWindow *contact_app_window_new(ContactApp *app) {
