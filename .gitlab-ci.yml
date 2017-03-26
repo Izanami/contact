@@ -1,0 +1,70 @@
+image: debian:sid
+
+before_script:
+    - apt-get update && apt-get -y upgrade  && apt-get -y install build-essential cmake clang git libcmocka-dev libglib2.0-dev ninja-build doxygen graphviz libgtk-3-dev
+    - mkdir build
+    - cd build
+    - export CC=clang
+    - export CXX=clang++
+    - cmake -G "Ninja" ..
+
+stages:
+  - build
+  - test
+  - deploy
+
+build_gcc:
+  stage: build
+  script:
+    - export CC=gcc
+    - export CXX=g++
+    - ninja
+
+build_clang:
+  stage: build
+  script:
+    - ninja
+
+test_fast:
+  stage: test
+  script:
+    - ninja
+    - ninja test
+
+test_devel:
+  stage: test
+  artifacts:
+    paths:
+        - build/Testing/
+    when: on_failure
+  script:
+    - cmake -G "Ninja" -DDEVEL=true ..
+    - ninja
+    - ninja test
+
+pages:
+  stage: deploy
+  script:
+  - ninja doc
+  - mv doc/html ../public/
+  environment:
+    name: documentation
+    url: https://jeser.frama.io/Contact/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
+
+deploy_bin:
+  stage: deploy
+  script:
+  - ninja
+  environment:
+    name: production
+    url: https://framagit.org/jeser/Data-Pipeline/builds/artifacts/master/download?job=deploy_bin
+  artifacts:
+    paths:
+    - build/
+  only:
+  - master
