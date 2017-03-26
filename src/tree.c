@@ -21,7 +21,6 @@ static void contact_tree_init(ContactTree *tree) {
 
     GtkTreeIter iter;
     gtk_list_store_append(list, &iter);
-    gtk_list_store_set(list, &iter, COLUMN_FIRSTNAME, "Adrien", -1);
 }
 
 static void contact_tree_class_init(ContactTreeClass *class) { (void)class; }
@@ -32,7 +31,14 @@ ContactTree *contact_tree_new() {
 
 gboolean contact_tree_open(ContactTree *tree, GFile *file) {
     (void)tree;
-    (void)file;
+    GError *err = NULL;
+    GFileInputStream *stream = g_file_read(file, NULL, &err);
+    GDataInputStream *data = g_data_input_stream_new(G_INPUT_STREAM(stream));
+
+    gsize length;
+
+    char *line = g_data_input_stream_read_line_utf8(data, &length, NULL, &err);
+    g_free(line);
 
     return TRUE;
 }
