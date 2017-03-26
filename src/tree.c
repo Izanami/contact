@@ -5,6 +5,7 @@
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
 #pragma clang diagnostic ignored "-Wused-but-marked-unused"
+#pragma clang diagnostic ignored "-Wassign-enum"
 
 /// \brief Window class
 struct _ContactTree {
@@ -44,8 +45,6 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
     ContactTreePrivate *priv;
     priv = contact_tree_get_instance_private(tree);
 
-    (void)tree;
-
     GError *err = NULL;
     GFileInputStream *stream = g_file_read(file, NULL, &err);
 
@@ -71,6 +70,9 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
 
     do {
         line = g_data_input_stream_read_line_utf8(data, &length, NULL, &err);
+        if (line != NULL) {
+            contact_tree_line(tree, line);
+        }
         g_free(line);
     } while (line != NULL);
 
@@ -81,6 +83,28 @@ gboolean contact_tree_set_window(ContactTree *tree, GtkWindow *win) {
     ContactTreePrivate *priv;
     priv = contact_tree_get_instance_private(tree);
     priv->win = win;
+    return TRUE;
+}
+
+gboolean contact_tree_line(ContactTree *tree, char *line) {
+    (void)tree;
+    (void)line;
+
+    GError *err = NULL;
+
+    GMatchInfo *match_info;
+    GRegex *regex = g_regex_new("([^,]+)", 0, 0, &err);
+    g_regex_match(regex, line, 0, &match_info);
+
+    while (g_match_info_matches(match_info)) {
+        gchar *word = g_match_info_fetch(match_info, 0);
+        g_print("Found: %s\n", word);
+        g_free(word);
+        g_match_info_next(match_info, NULL);
+    }
+    g_match_info_free(match_info);
+    g_regex_unref(regex);
+
     return TRUE;
 }
 
