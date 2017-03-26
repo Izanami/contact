@@ -33,6 +33,18 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
     (void)tree;
     GError *err = NULL;
     GFileInputStream *stream = g_file_read(file, NULL, &err);
+
+    // If error, then display a dialog
+    if (err != NULL) {
+        GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+        GtkWidget *dialog =
+            gtk_message_dialog_new(NULL, flags, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE, "%s", err->message);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        return FALSE;
+    }
+
     GDataInputStream *data = g_data_input_stream_new(G_INPUT_STREAM(stream));
 
     gsize length;

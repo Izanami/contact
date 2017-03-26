@@ -8,6 +8,7 @@ G_DECLARE_FINAL_TYPE(ContactTree, contact_tree, CONTACT, TREE, GtkListStore)
 
 ContactTree *contact_tree_new(void);
 gboolean contact_tree_open(ContactTree *, GFile *);
+gboolean contact_tree_line(ContactTree *, char *);
 
 enum {
     COLUMN_FIRSTNAME,
