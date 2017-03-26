@@ -30,4 +30,11 @@ ContactTree *contact_tree_new() {
     return g_object_new(CONTACT_TREE_TYPE, NULL, NULL, NULL);
 }
 
+gboolean contact_tree_open(ContactTree *tree, GFile *file) {
+    (void)tree;
+    (void)file;
+
+    return TRUE;
+}
+
 #pragma GCC diagnostic pop
