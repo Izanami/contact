@@ -14,15 +14,11 @@ struct _ContactAppWindow {
 };
 
 /// \brief Private attribute
-struct ContactAppWindowPrivate {
+struct _ContactAppWindowPrivate {
     GtkWidget *stack;
 };
 
 typedef struct _ContactAppWindowPrivate ContactAppWindowPrivate;
-
-struct _ContactAppWindowPrivate {
-    GtkWidget *stack;
-};
 
 G_DEFINE_TYPE_WITH_PRIVATE(ContactAppWindow, contact_app_window,
                            GTK_TYPE_APPLICATION_WINDOW)
@@ -61,6 +57,7 @@ void contact_app_window_open(ContactAppWindow *win, GFile *file) {
 
     /* List */
     ContactTree *store = contact_tree_new();
+    contact_tree_set_window(store, GTK_WINDOW(win));
     contact_tree_open(store, file);
     GtkWidget *tree;
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));

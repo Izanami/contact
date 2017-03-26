@@ -4,15 +4,26 @@
 
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#pragma clang diagnostic ignored "-Wused-but-marked-unused"
 
 /// \brief Window class
 struct _ContactTree {
     GtkListStore parent;  ///< Parent
 };
 
-G_DEFINE_TYPE(ContactTree, contact_tree, GTK_TYPE_LIST_STORE)
+struct _ContactTreePrivate {
+    GtkWindow *win;
+};
+
+typedef struct _ContactTreePrivate ContactTreePrivate;
+
+G_DEFINE_TYPE_WITH_PRIVATE(ContactTree, contact_tree, GTK_TYPE_LIST_STORE)
 
 static void contact_tree_init(ContactTree *tree) {
+    ContactTreePrivate *priv;
+    priv = contact_tree_get_instance_private(tree);
+    priv->win = NULL;
+
     GtkListStore *list = GTK_LIST_STORE(tree);
     GType column[] = {G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
                       G_TYPE_STRING, G_TYPE_STRING};
@@ -30,7 +41,11 @@ ContactTree *contact_tree_new() {
 }
 
 gboolean contact_tree_open(ContactTree *tree, GFile *file) {
+    ContactTreePrivate *priv;
+    priv = contact_tree_get_instance_private(tree);
+
     (void)tree;
+
     GError *err = NULL;
     GFileInputStream *stream = g_file_read(file, NULL, &err);
 
@@ -38,7 +53,7 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
     if (err != NULL) {
         GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
         GtkWidget *dialog =
-            gtk_message_dialog_new(NULL, flags, GTK_MESSAGE_ERROR,
+            gtk_message_dialog_new(priv->win, flags, GTK_MESSAGE_ERROR,
                                    GTK_BUTTONS_CLOSE, "%s", err->message);
         gtk_dialog_run(GTK_DIALOG(dialog));
         gtk_widget_destroy(dialog);
@@ -55,6 +70,13 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
         g_free(line);
     } while (line != NULL);
 
+    return TRUE;
+}
+
+gboolean contact_tree_set_window(ContactTree *tree, GtkWindow *win) {
+    ContactTreePrivate *priv;
+    priv = contact_tree_get_instance_private(tree);
+    priv->win = win;
     return TRUE;
 }
 
