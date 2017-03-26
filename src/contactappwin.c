@@ -42,6 +42,13 @@ ContactAppWindow *contact_app_window_new(ContactApp *app) {
 void contact_app_window_open(ContactAppWindow *win, GFile *file) {
     ContactAppWindowPrivate *priv;
 
+    /* Parse the file */
+    ContactTree *store = contact_tree_new();
+    contact_tree_set_window(store, GTK_WINDOW(win));
+    if (!contact_tree_open(store, file)) {
+        return;
+    }
+
     /* Stack */
     gchar *basename;
     basename = g_file_get_basename(file);
@@ -56,9 +63,6 @@ void contact_app_window_open(ContactAppWindow *win, GFile *file) {
     gtk_stack_add_titled(GTK_STACK(priv->stack), scrolled, basename, basename);
 
     /* List */
-    ContactTree *store = contact_tree_new();
-    contact_tree_set_window(store, GTK_WINDOW(win));
-    contact_tree_open(store, file);
     GtkWidget *tree;
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 

@@ -65,6 +65,10 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
     gsize length;
     char *line;
 
+    /* Ignore the first line (header) */
+    line = g_data_input_stream_read_line_utf8(data, &length, NULL, &err);
+    g_free(line);
+
     do {
         line = g_data_input_stream_read_line_utf8(data, &length, NULL, &err);
         g_free(line);
