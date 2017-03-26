@@ -66,6 +66,11 @@ add_executable(test-main src/main_test.c)
 target_link_libraries(test-main contact ${CMOCKA_LIBRARY})
 add_test(test-main test-main)
 
+###
+# Sample
+###
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data.csv ${CMAKE_CURRENT_BINARY_DIR}/data.csv @ONLY)
+
 
 ###
 # DOCUMENTATION
