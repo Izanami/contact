@@ -37,7 +37,7 @@ add_definitions(${GTK3_CFLAGS_OTHER})
 
 
 # Build shared libraries.
-add_library(contact SHARED src/main.c)
+add_library(contact SHARED src/main.c src/contactapp.c src/contactappwin.c)
 target_link_libraries(contact ${GTK3_LIBRARIES})
 
 # Build
