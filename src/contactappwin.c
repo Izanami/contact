@@ -61,6 +61,7 @@ void contact_app_window_open(ContactAppWindow *win, GFile *file) {
 
     /* List */
     ContactTree *store = contact_tree_new();
+    contact_tree_open(store, file);
     GtkWidget *tree;
     tree = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
