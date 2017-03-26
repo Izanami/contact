@@ -6,8 +6,9 @@
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
 
+/// \brief Window class
 struct _ContactAppWindow {
-    GtkApplicationWindow parent;
+    GtkApplicationWindow parent;  ///< Parent
 };
 
 G_DEFINE_TYPE(ContactAppWindow, contact_app_window, GTK_TYPE_APPLICATION_WINDOW)

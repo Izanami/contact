@@ -4,8 +4,9 @@
 #pragma GCC diagnostic push
 #pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
 
+///  \brief Contact class
 struct _ContactApp {
-    GtkApplication parent;
+    GtkApplication parent;  ///< Parent
 };
 
 G_DEFINE_TYPE(ContactApp, contact_app, GTK_TYPE_APPLICATION)
