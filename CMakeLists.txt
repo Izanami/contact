@@ -35,10 +35,23 @@ include_directories(${GTK3_INCLUDE_DIRS})
 link_directories(${GTK3_LIBRARY_DIRS})
 add_definitions(${GTK3_CFLAGS_OTHER})
 
+# GResource
+include("${CMAKE_SOURCE_DIR}/cmake/gresource.cmake")
+find_package (gresources REQUIRED)
+gresource (
+  "${CMAKE_SOURCE_DIR}/resources" # resource dir
+  "contact.gresource.xml"   # resource file
+  "${CMAKE_BINARY_DIR}/"          # output dir
+  generated_resource
+)
+
+set (generated_resources ${generated_resource})
+add_library(contact-resource ${generated_resources})
+set_target_properties(contact-resource PROPERTIES COMPILE_FLAGS "-Wno-reserved-id-macro -Wno-documentation-unknown-command -Wno-documentation -Wno-padded" )
 
 # Build shared libraries.
-add_library(contact SHARED src/main.c)
-target_link_libraries(contact ${GTK3_LIBRARIES})
+add_library(contact SHARED src/main.c src/contactapp.c src/contactappwin.c)
+target_link_libraries(contact ${GTK3_LIBRARIES} contact-resource)
 
 # Build
 add_executable(contact-bin src/main.c)
