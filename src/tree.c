@@ -99,35 +99,64 @@ gboolean contact_tree_firstname(ContactTree *tree, GtkTreeIter *iter,
     return TRUE;
 }
 
+gboolean contact_tree_lastname(ContactTree *tree, GtkTreeIter *iter,
+                               char *string) {
+    GValue g_str = G_VALUE_INIT;
+    g_value_init(&g_str, G_TYPE_STRING);
+    g_value_set_static_string(&g_str, string);
+    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_LASTNAME,
+                             &g_str);
+
+    return TRUE;
+}
+
+gboolean contact_tree_mail(ContactTree *tree, GtkTreeIter *iter, char *string) {
+    GValue g_str = G_VALUE_INIT;
+    g_value_init(&g_str, G_TYPE_STRING);
+    g_value_set_static_string(&g_str, string);
+    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_MAIL, &g_str);
+
+    return TRUE;
+}
+
+gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
+                            char *string) {
+    GValue g_str = G_VALUE_INIT;
+    g_value_init(&g_str, G_TYPE_STRING);
+    g_value_set_static_string(&g_str, string);
+    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE, &g_str);
+
+    return TRUE;
+}
+
+gboolean contact_tree_birth(ContactTree *tree, GtkTreeIter *iter,
+                            char *string) {
+    GValue g_str = G_VALUE_INIT;
+    g_value_init(&g_str, G_TYPE_STRING);
+    g_value_set_static_string(&g_str, string);
+    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_BIRTH, &g_str);
+
+    return TRUE;
+}
+
 gboolean contact_tree_line(ContactTree *tree, char *line) {
     (void)tree;
     (void)line;
-    int i = 0;
-    GError *err = NULL;
     static contact_tree_process callback_field[] = {
-        contact_tree_firstname, contact_tree_firstname, contact_tree_firstname,
-        contact_tree_firstname, contact_tree_firstname};
+        contact_tree_lastname, contact_tree_firstname, contact_tree_mail,
+        contact_tree_phone, contact_tree_birth};
 
     /* New iter */
     GtkTreeIter iter;
     gtk_list_store_append(GTK_LIST_STORE(tree), &iter);
 
-    GMatchInfo *match_info;
-    GRegex *regex = g_regex_new("([^,]+)", 0, 0, &err);
-    g_regex_match(regex, line, 0, &match_info);
+    gchar **field = g_strsplit(line, ",", 5);
 
-    while (g_match_info_matches(match_info)) {
-        gchar *word = g_match_info_fetch(match_info, 0);
-
-        if (word != NULL) {
-            callback_field[i++](tree, &iter, word);
-        }
-
-        g_free(word);
-        g_match_info_next(match_info, NULL);
+    for (int i = 0; i < 5; ++i) {
+        callback_field[i](tree, &iter, field[i]);
     }
-    g_match_info_free(match_info);
-    g_regex_unref(regex);
+
+    g_strfreev(field);
 
     return TRUE;
 }

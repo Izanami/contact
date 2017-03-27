@@ -11,6 +11,10 @@ gboolean contact_tree_open(ContactTree *, GFile *);
 gboolean contact_tree_set_window(ContactTree *, GtkWindow *);
 gboolean contact_tree_line(ContactTree *, char *);
 gboolean contact_tree_firstname(ContactTree *, GtkTreeIter *, char *);
+gboolean contact_tree_lastname(ContactTree *, GtkTreeIter *, char *);
+gboolean contact_tree_mail(ContactTree *, GtkTreeIter *, char *);
+gboolean contact_tree_phone(ContactTree *, GtkTreeIter *, char *);
+gboolean contact_tree_birth(ContactTree *, GtkTreeIter *, char *);
 
 enum {
     COLUMN_FIRSTNAME,
