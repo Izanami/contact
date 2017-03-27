@@ -269,7 +269,7 @@ static gboolean uppercase(const GMatchInfo *info, GString *res, gpointer data) {
     return FALSE;
 }
 
-void contact_tree_capitalize(ContactTree *tree, char *string) {
+gboolean contact_tree_capitalize(ContactTree *tree, char *string) {
     (void)tree;
     GRegex *regex = g_regex_new("^\\w", 0, 0, NULL);
 
@@ -284,6 +284,8 @@ void contact_tree_capitalize(ContactTree *tree, char *string) {
     g_utf8_strncpy(string, result, (gsize)length);
 
     g_regex_unref(regex);
+
+    return TRUE;
 }
 
 #pragma GCC diagnostic pop
