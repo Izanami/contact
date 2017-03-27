@@ -90,9 +90,12 @@ gboolean contact_tree_set_window(ContactTree *tree, GtkWindow *win) {
 
 gboolean contact_tree_firstname(ContactTree *tree, GtkTreeIter *iter,
                                 char *string) {
+    contact_tree_capitalize(tree, string);
+
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
     g_value_set_static_string(&g_str, string);
+
     gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_FIRSTNAME,
                              &g_str);
 
@@ -101,6 +104,7 @@ gboolean contact_tree_firstname(ContactTree *tree, GtkTreeIter *iter,
 
 gboolean contact_tree_lastname(ContactTree *tree, GtkTreeIter *iter,
                                char *string) {
+    contact_tree_capitalize(tree, string);
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
     g_value_set_static_string(&g_str, string);
@@ -159,6 +163,34 @@ gboolean contact_tree_line(ContactTree *tree, char *line) {
     g_strfreev(field);
 
     return TRUE;
+}
+
+static gboolean uppercase(const GMatchInfo *info, GString *res, gpointer data) {
+    gchar *match = g_match_info_fetch(info, 0);
+
+    g_string_append(res, g_utf8_strup(match, -1));
+    g_free(match);
+    (void)data;
+
+    return FALSE;
+}
+
+void contact_tree_capitalize(ContactTree *tree, char *string) {
+    (void)tree;
+    // Print all uppercase-only words.
+    GRegex *regex = g_regex_new("^.", 0, 0, NULL);
+
+    char *result =
+        g_regex_replace_eval(regex, string, -1, 0, 0, uppercase, NULL, NULL);
+
+    GRegex *regex2 = g_regex_new("-(.)", 0, 0, NULL);
+    result =
+        g_regex_replace_eval(regex2, result, -1, 0, 0, uppercase, NULL, NULL);
+
+    glong length = g_utf8_strlen(result, -1);
+    g_utf8_strncpy(string, result, (gsize)length);
+
+    g_regex_unref(regex);
 }
 
 #pragma GCC diagnostic pop
