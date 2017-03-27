@@ -168,7 +168,7 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
 
     // Check format phone
     GMatchInfo *match_info;
-    GRegex *regex_check = g_regex_new("^\\d{10}$", 0, 0, NULL);
+    GRegex *regex_check = g_regex_new("^0\\d{9}$", 0, 0, NULL);
 
     g_regex_match(regex_check, phone, 0, &match_info);
     if (g_match_info_matches(match_info)) {
