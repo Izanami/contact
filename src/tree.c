@@ -211,7 +211,7 @@ gboolean contact_tree_birth(ContactTree *tree, GtkTreeIter *iter,
         return FALSE;
     }
 
-    char *date_str = g_date_time_format(date, "%d/%m/%y");
+    char *date_str = g_date_time_format(date, "%d/%m/%Y");
     g_value_set_static_string(&g_str, date_str);
     gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_BIRTH, &g_str);
 
