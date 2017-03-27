@@ -170,15 +170,7 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
         gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE,
                                  &g_str);
     } else {
-        ContactTreePrivate *priv;
-        priv = contact_tree_get_instance_private(tree);
-
-        GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
-        GtkWidget *dialog = gtk_message_dialog_new(
-            priv->win, flags, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
-            "Invalid phone : %s", phone);
-        gtk_dialog_run(GTK_DIALOG(dialog));
-        gtk_widget_destroy(dialog);
+        g_log("contact", G_LOG_LEVEL_WARNING, "Invalid number (%s)", phone);
     }
 
     g_free(phone_without_delimiter);
