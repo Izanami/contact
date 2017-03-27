@@ -10,6 +10,7 @@ ContactTree *contact_tree_new(void);
 gboolean contact_tree_open(ContactTree *, GFile *);
 gboolean contact_tree_set_window(ContactTree *, GtkWindow *);
 gboolean contact_tree_line(ContactTree *, char *);
+gboolean contact_tree_firstname(ContactTree *, GtkTreeIter *, char *);
 
 enum {
     COLUMN_FIRSTNAME,

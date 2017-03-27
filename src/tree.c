@@ -7,6 +7,8 @@
 #pragma clang diagnostic ignored "-Wused-but-marked-unused"
 #pragma clang diagnostic ignored "-Wassign-enum"
 
+typedef gboolean (*contact_tree_process)(ContactTree *, GtkTreeIter *, char *);
+
 /// \brief Window class
 struct _ContactTree {
     GtkListStore parent;  ///< Parent
@@ -86,11 +88,29 @@ gboolean contact_tree_set_window(ContactTree *tree, GtkWindow *win) {
     return TRUE;
 }
 
+gboolean contact_tree_firstname(ContactTree *tree, GtkTreeIter *iter,
+                                char *string) {
+    GValue g_str = G_VALUE_INIT;
+    g_value_init(&g_str, G_TYPE_STRING);
+    g_value_set_static_string(&g_str, string);
+    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_FIRSTNAME,
+                             &g_str);
+
+    return TRUE;
+}
+
 gboolean contact_tree_line(ContactTree *tree, char *line) {
     (void)tree;
     (void)line;
-
+    int i = 0;
     GError *err = NULL;
+    static contact_tree_process callback_field[] = {
+        contact_tree_firstname, contact_tree_firstname, contact_tree_firstname,
+        contact_tree_firstname, contact_tree_firstname};
+
+    /* New iter */
+    GtkTreeIter iter;
+    gtk_list_store_append(GTK_LIST_STORE(tree), &iter);
 
     GMatchInfo *match_info;
     GRegex *regex = g_regex_new("([^,]+)", 0, 0, &err);
@@ -98,7 +118,11 @@ gboolean contact_tree_line(ContactTree *tree, char *line) {
 
     while (g_match_info_matches(match_info)) {
         gchar *word = g_match_info_fetch(match_info, 0);
-        g_print("Found: %s\n", word);
+
+        if (word != NULL) {
+            callback_field[i++](tree, &iter, word);
+        }
+
         g_free(word);
         g_match_info_next(match_info, NULL);
     }
