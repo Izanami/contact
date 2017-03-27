@@ -1,3 +1,4 @@
+#include <string.h>
 #include "gtk.h"
 
 #include "tree.h"
@@ -387,13 +388,12 @@ gboolean contact_tree_write(ContactTree *tree, GFile *file) {
         return FALSE;
     }
 
-    gint a = 1;
-    gchar *buf = g_strdup_printf(" %d", a);
-    g_output_stream_write(G_OUTPUT_STREAM(output), buf, 2, NULL, NULL);
+    gchar head[] = "Nom,Prénom,Mail,Téléphone,Date_Naiss\n";
+    g_output_stream_write(G_OUTPUT_STREAM(output), head, strlen(head), NULL,
+                          NULL);
+
     g_output_stream_close(G_OUTPUT_STREAM(output), NULL, NULL);
-    g_free(buf);
     g_object_unref(output);
-    /*g_object_unref(f);*/
 
     (void)tree;
     (void)file;
