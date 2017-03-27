@@ -45,7 +45,7 @@ static void contact_app_class_init(ContactAppClass *class) {
 
 ContactApp *contact_app_new(void) {
     return g_object_new(CONTACT_APP_TYPE, "application-id",
-                        "org.gtk.exampleapp", "flags",
+                        "org.gtk.contactapp", "flags",
                         G_APPLICATION_HANDLES_OPEN, NULL);
 }
 

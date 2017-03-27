@@ -50,11 +50,12 @@ add_library(contact-resource ${generated_resources})
 set_target_properties(contact-resource PROPERTIES COMPILE_FLAGS "-Wno-reserved-id-macro -Wno-documentation-unknown-command -Wno-documentation -Wno-padded" )
 
 # Build shared libraries.
-add_library(contact SHARED src/main.c src/contactapp.c src/contactappwin.c)
+add_library(contact SHARED src/main.c src/contactapp.c src/contactappwin.c src/tree.c)
 target_link_libraries(contact ${GTK3_LIBRARIES} contact-resource)
 
 # Build
-add_executable(contact-bin src/main.c)
+add_executable(contact-bin src/main.c ${generated_resource})
+set_target_properties(contact-bin PROPERTIES COMPILE_FLAGS "-Wno-reserved-id-macro -Wno-documentation-unknown-command -Wno-documentation -Wno-padded" )
 target_link_libraries(contact-bin contact)
 
 ###
@@ -64,6 +65,11 @@ enable_testing()
 add_executable(test-main src/main_test.c)
 target_link_libraries(test-main contact ${CMOCKA_LIBRARY})
 add_test(test-main test-main)
+
+###
+# Sample
+###
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/data.csv ${CMAKE_CURRENT_BINARY_DIR}/data.csv @ONLY)
 
 
 ###
