@@ -10,13 +10,14 @@
 
 typedef gboolean (*contact_tree_process)(ContactTree *, GtkTreeIter *, char *);
 
-/// \brief Window class
+/// \brief Tree class
 struct _ContactTree {
     GtkListStore parent;  ///< Parent
 };
 
+/// \brief Tree private.
 struct _ContactTreePrivate {
-    GtkWindow *win;
+    GtkWindow *win;  ///< Window parent
 };
 
 typedef struct _ContactTreePrivate ContactTreePrivate;

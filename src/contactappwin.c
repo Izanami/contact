@@ -15,7 +15,7 @@ struct _ContactAppWindow {
 
 /// \brief Private attribute
 struct _ContactAppWindowPrivate {
-    GtkWidget *stack;
+    GtkWidget *stack;  ///< Stack
 };
 
 typedef struct _ContactAppWindowPrivate ContactAppWindowPrivate;
