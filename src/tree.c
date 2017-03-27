@@ -123,12 +123,43 @@ gboolean contact_tree_mail(ContactTree *tree, GtkTreeIter *iter, char *string) {
     return TRUE;
 }
 
+static gboolean regex_remove(const GMatchInfo *info, GString *res,
+                             gpointer data) {
+    gchar *match = g_match_info_fetch(info, 0);
+
+    g_free(match);
+    (void)data;
+    (void)res;
+    return FALSE;
+}
+
+static gboolean regex_phone_indicator(const GMatchInfo *info, GString *res,
+                                      gpointer data) {
+    gchar *match = g_match_info_fetch(info, 0);
+
+    g_string_append(res, "0");
+    g_free(match);
+    (void)data;
+    return FALSE;
+}
+
 gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
                             char *string) {
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
-    g_value_set_static_string(&g_str, string);
+
+    GRegex *regex = g_regex_new("(\\.|\\s)", 0, 0, NULL);
+    char *result =
+        g_regex_replace_eval(regex, string, -1, 0, 0, regex_remove, NULL, NULL);
+
+    GRegex *regex_indicator = g_regex_new("^\\+33", 0, 0, NULL);
+    char *phone_str = g_regex_replace_eval(regex_indicator, result, -1, 0, 0,
+                                           regex_phone_indicator, NULL, NULL);
+
+    g_value_set_static_string(&g_str, phone_str);
     gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE, &g_str);
+    g_free(result);
+    g_free(phone_str);
 
     return TRUE;
 }
