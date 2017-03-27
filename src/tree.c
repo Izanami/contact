@@ -392,11 +392,40 @@ gboolean contact_tree_write(ContactTree *tree, GFile *file) {
     g_output_stream_write(G_OUTPUT_STREAM(output), head, strlen(head), NULL,
                           NULL);
 
+    gsize length = 0;
+    GtkTreeIter iter;
+    gboolean valid = gtk_tree_model_get_iter_first(GTK_TREE_MODEL(tree), &iter);
+
+    while (valid) {
+        gchar *firstname;
+        gchar *lastname;
+        gchar *mail;
+        gchar *phone;
+        gchar *birth;
+
+        // Make sure you terminate calls to gtk_tree_model_get() with a “-1”
+        // value
+        gtk_tree_model_get(GTK_TREE_MODEL(tree), &iter, COLUMN_FIRSTNAME,
+                           &firstname, COLUMN_LASTNAME, &lastname, COLUMN_MAIL,
+                           &mail, COLUMN_PHONE, &phone, COLUMN_BIRTH, &birth,
+                           -1);
+
+        valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(tree), &iter);
+
+        g_output_stream_printf(G_OUTPUT_STREAM(output), &length, NULL, &err,
+                               "%s,%s,%s,%s,%s\n", lastname, firstname, mail,
+                               phone, birth);
+
+        g_free(firstname);
+        g_free(lastname);
+        g_free(mail);
+        g_free(phone);
+        g_free(birth);
+    }
+
     g_output_stream_close(G_OUTPUT_STREAM(output), NULL, NULL);
     g_object_unref(output);
 
-    (void)tree;
-    (void)file;
     return TRUE;
 }
 
