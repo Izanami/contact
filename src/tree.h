@@ -17,7 +17,8 @@ gboolean contact_tree_mail(ContactTree *, GtkTreeIter *, char *);
 gboolean contact_tree_phone(ContactTree *, GtkTreeIter *, char *);
 gboolean contact_tree_birth(ContactTree *, GtkTreeIter *, char *);
 gboolean contact_tree_capitalize(ContactTree *, char *);
-gboolean contact_tree_mail_generate(ContactTree *tree, GtkTreeIter *iter);
+gboolean contact_tree_mail_generate(ContactTree *, GtkTreeIter *);
+gboolean contact_tree_write(ContactTree *, GFile *);
 
 enum {
     COLUMN_FIRSTNAME,

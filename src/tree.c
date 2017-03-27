@@ -76,6 +76,10 @@ gboolean contact_tree_open(ContactTree *tree, GFile *file) {
         g_free(line);
     } while (line != NULL);
 
+    g_input_stream_close(G_INPUT_STREAM(stream), NULL, NULL);
+
+    contact_tree_write(tree, file);
+
     return TRUE;
 }
 
@@ -359,6 +363,40 @@ gboolean contact_tree_mail_generate(ContactTree *tree, GtkTreeIter *iter) {
     g_free(lastname_l);
     g_free(lastname_a);
 
+    return TRUE;
+}
+
+gboolean contact_tree_write(ContactTree *tree, GFile *file) {
+    ContactTreePrivate *priv;
+    priv = contact_tree_get_instance_private(tree);
+
+    GError *err = NULL;
+
+    /*GFile *f = g_file_new_for_path("./data.csv");*/
+    GFileOutputStream *output =
+        g_file_replace(file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, &err);
+
+    // If error, then display a dialog
+    if (err != NULL) {
+        GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+        GtkWidget *dialog =
+            gtk_message_dialog_new(priv->win, flags, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE, "%s", err->message);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        return FALSE;
+    }
+
+    gint a = 1;
+    gchar *buf = g_strdup_printf(" %d", a);
+    g_output_stream_write(G_OUTPUT_STREAM(output), buf, 2, NULL, NULL);
+    g_output_stream_close(G_OUTPUT_STREAM(output), NULL, NULL);
+    g_free(buf);
+    g_object_unref(output);
+    /*g_object_unref(f);*/
+
+    (void)tree;
+    (void)file;
     return TRUE;
 }
 
