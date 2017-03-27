@@ -220,13 +220,12 @@ static gboolean uppercase(const GMatchInfo *info, GString *res, gpointer data) {
 
 void contact_tree_capitalize(ContactTree *tree, char *string) {
     (void)tree;
-    // Print all uppercase-only words.
-    GRegex *regex = g_regex_new("^.", 0, 0, NULL);
+    GRegex *regex = g_regex_new("^\\w", 0, 0, NULL);
 
     char *result =
         g_regex_replace_eval(regex, string, -1, 0, 0, uppercase, NULL, NULL);
 
-    GRegex *regex2 = g_regex_new("-(.)", 0, 0, NULL);
+    GRegex *regex2 = g_regex_new("-(\\w)", 0, 0, NULL);
     result =
         g_regex_replace_eval(regex2, result, -1, 0, 0, uppercase, NULL, NULL);
 
