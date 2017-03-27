@@ -171,6 +171,9 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
                                  &g_str);
     } else {
         g_log("contact", G_LOG_LEVEL_WARNING, "Invalid number (%s)", phone);
+        g_free(phone_without_delimiter);
+        g_free(phone);
+        return FALSE;
     }
 
     g_free(phone_without_delimiter);
@@ -246,7 +249,9 @@ gboolean contact_tree_line(ContactTree *tree, char *line) {
     gchar **field = g_strsplit(line, ",", 5);
 
     for (int i = 0; i < 5; ++i) {
-        callback_field[i](tree, &iter, field[i]);
+        if (!callback_field[i](tree, &iter, field[i])) {
+            g_log("contact", G_LOG_LEVEL_WARNING, "Error in a line : %s", line);
+        }
     }
 
     g_strfreev(field);
