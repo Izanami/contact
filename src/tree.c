@@ -214,12 +214,12 @@ static GDateTime *str_to_date(char *string) {
         g_free(month);
         g_free(day);
 
-        g_match_info_free(match_info);
-        g_regex_unref(regex);
-
         // Create nex date
         date = g_date_time_new_local(year_i, month_i, day_i, 0, 0, 0);
     }
+
+    g_match_info_free(match_info);
+    g_regex_unref(regex);
 
     return date;
 }
