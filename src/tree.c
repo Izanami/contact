@@ -133,11 +133,55 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
     return TRUE;
 }
 
+static GDateTime *str_to_date(char *string) {
+    GDateTime *date = NULL;
+    GRegex *regex;
+    GMatchInfo *match_info;
+
+    regex = g_regex_new("(\\d{4})-(\\d{2})-(\\d{2})", 0, 0, NULL);
+    g_regex_match(regex, string, 0, &match_info);
+    if (g_match_info_matches(match_info)) {
+        gchar *year = g_match_info_fetch(match_info, 1);
+        gchar *month = g_match_info_fetch(match_info, 2);
+        gchar *day = g_match_info_fetch(match_info, 3);
+
+        gint year_i = (gint)g_ascii_strtoll(year, NULL, 10);
+        gint month_i = (gint)g_ascii_strtoll(month, NULL, 10);
+        gint day_i = (gint)g_ascii_strtoll(day, NULL, 10);
+
+        g_free(year);
+        g_free(month);
+        g_free(day);
+
+        g_match_info_free(match_info);
+        g_regex_unref(regex);
+
+        date = g_date_time_new_local(year_i, month_i, day_i, 0, 0, 0);
+    }
+
+    return date;
+}
+
 gboolean contact_tree_birth(ContactTree *tree, GtkTreeIter *iter,
                             char *string) {
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
-    g_value_set_static_string(&g_str, string);
+    GDateTime *date = str_to_date(string);
+    ContactTreePrivate *priv;
+    priv = contact_tree_get_instance_private(tree);
+
+    if (date == NULL) {
+        GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+        GtkWidget *dialog =
+            gtk_message_dialog_new(priv->win, flags, GTK_MESSAGE_ERROR,
+                                   GTK_BUTTONS_CLOSE, "Invalid : %s", string);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+        return FALSE;
+    }
+
+    char *date_str = g_date_time_format(date, "%d/%m/%y");
+    g_value_set_static_string(&g_str, date_str);
     gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_BIRTH, &g_str);
 
     return TRUE;
@@ -145,7 +189,6 @@ gboolean contact_tree_birth(ContactTree *tree, GtkTreeIter *iter,
 
 gboolean contact_tree_line(ContactTree *tree, char *line) {
     (void)tree;
-    (void)line;
     static contact_tree_process callback_field[] = {
         contact_tree_lastname, contact_tree_firstname, contact_tree_mail,
         contact_tree_phone, contact_tree_birth};
