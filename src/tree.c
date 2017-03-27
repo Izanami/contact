@@ -148,17 +148,38 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
 
-    GRegex *regex_phone_delimiter = g_regex_new("(\\.|\\s)", 0, 0, NULL);
+    /* Remove delimiter : "." and whitespace */
+    GRegex *regex_phone_delimiter = g_regex_new("(\\.|\\s|/)", 0, 0, NULL);
     char *phone_without_delimiter = g_regex_replace_eval(
         regex_phone_delimiter, string, -1, 0, 0, regex_remove, NULL, NULL);
 
+    /* Remplace indicator by 0 */
     GRegex *regex_indicator = g_regex_new("^\\+33", 0, 0, NULL);
     char *phone =
         g_regex_replace_eval(regex_indicator, phone_without_delimiter, -1, 0, 0,
                              regex_phone_indicator, NULL, NULL);
 
-    g_value_set_static_string(&g_str, phone);
-    gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE, &g_str);
+    /* Check format phone */
+    GMatchInfo *match_info;
+    GRegex *regex_check = g_regex_new("^\\d{10}$", 0, 0, NULL);
+
+    g_regex_match(regex_check, phone, 0, &match_info);
+    if (g_match_info_matches(match_info)) {
+        /* Insert phone in store  */
+        g_value_set_static_string(&g_str, phone);
+        gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE,
+                                 &g_str);
+    } else {
+        ContactTreePrivate *priv;
+        priv = contact_tree_get_instance_private(tree);
+
+        GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+        GtkWidget *dialog = gtk_message_dialog_new(
+            priv->win, flags, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE,
+            "Invalid phone : %s", phone);
+        gtk_dialog_run(GTK_DIALOG(dialog));
+        gtk_widget_destroy(dialog);
+    }
 
     g_free(phone_without_delimiter);
     g_free(phone);
