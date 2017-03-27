@@ -148,18 +148,20 @@ gboolean contact_tree_phone(ContactTree *tree, GtkTreeIter *iter,
     GValue g_str = G_VALUE_INIT;
     g_value_init(&g_str, G_TYPE_STRING);
 
-    GRegex *regex = g_regex_new("(\\.|\\s)", 0, 0, NULL);
-    char *result =
-        g_regex_replace_eval(regex, string, -1, 0, 0, regex_remove, NULL, NULL);
+    GRegex *regex_phone_delimiter = g_regex_new("(\\.|\\s)", 0, 0, NULL);
+    char *phone_without_delimiter = g_regex_replace_eval(
+        regex_phone_delimiter, string, -1, 0, 0, regex_remove, NULL, NULL);
 
     GRegex *regex_indicator = g_regex_new("^\\+33", 0, 0, NULL);
-    char *phone_str = g_regex_replace_eval(regex_indicator, result, -1, 0, 0,
-                                           regex_phone_indicator, NULL, NULL);
+    char *phone =
+        g_regex_replace_eval(regex_indicator, phone_without_delimiter, -1, 0, 0,
+                             regex_phone_indicator, NULL, NULL);
 
-    g_value_set_static_string(&g_str, phone_str);
+    g_value_set_static_string(&g_str, phone);
     gtk_list_store_set_value(GTK_LIST_STORE(tree), iter, COLUMN_PHONE, &g_str);
-    g_free(result);
-    g_free(phone_str);
+
+    g_free(phone_without_delimiter);
+    g_free(phone);
 
     return TRUE;
 }
